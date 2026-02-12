@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { SelectItem,Select, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DEPARTMENT_OPTIONS } from '@/constants'
-import Subject from '@/types/subject'
+import {Subject} from '@/types/index'
 import { useTable } from '@refinedev/react-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { Search } from 'lucide-react'
@@ -52,7 +52,7 @@ const SubjectsList = () => {
         },
         {
           id: "department",
-          accessorKey: "department",
+          accessorKey: "department.name",
           header: ()=> <p className='column-title'>department</p>,
           cell: ({getValue}) => <Badge variant='secondary' >{getValue<string>()}</Badge>,
           size: 150
