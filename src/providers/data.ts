@@ -1,19 +1,46 @@
+import { BACKEND_BASE_URL } from "@/constants";
+import { ListResponse, Department } from "@/types";
 import { DataProvider } from "@refinedev/core";
-import { MOCK_SUBJECTS, API_URL } from "./constants";
+import {createDataProvider, CreateDataProviderOptions} from '@refinedev/rest'
 
-export const dataProvider: DataProvider = {
-  getList: async ({ resource }) => {
-    if (resource === "subjects") {
-      return {
-        data: MOCK_SUBJECTS,
-        total: MOCK_SUBJECTS.length,
-      } as any;
+const options: CreateDataProviderOptions  = {
+  getList: {
+    getEndpoint: ({resource}) => resource,
+    
+    buildQueryParams: async ({resource, pagination, filters,}) => {
+      const page = pagination?.currentPage ?? 1;
+      const pageSize = pagination?.pageSize ?? 10;
+
+      const params: Record<string, string|number> = {page, limit: pageSize}
+
+      filters?.forEach(filter => {
+        
+        const field = 'field' in filter ? filter.field : ''
+        const value = String(filter.value)
+
+        if(resource === 'subjects'){
+          if(field === 'department') params.department = value;
+          if(field === 'code' || field === 'name') params.search = value;
+        }
+      })
+      return params
+    },
+
+    mapResponse: async(response) => {
+      const payload:ListResponse = await response.json()
+
+      return payload.data ?? []
+    },
+
+    getTotalCount: async (response) => {
+      const payload: ListResponse = await response.json()
+
+      return payload.pagination?.total ?? payload.data?.length ?? 0
     }
-    return { data: [], total: 0 };
-  },
-  getOne: async () => { throw new Error("Not implemented"); },
-  create: async () => { throw new Error("Not implemented"); },
-  update: async () => { throw new Error("Not implemented"); },
-  deleteOne: async () => { throw new Error("Not implemented"); },
-  getApiUrl: () => API_URL,
-};
+
+  }
+}
+
+const {dataProvider} = createDataProvider(BACKEND_BASE_URL, options)
+
+export {dataProvider}
