@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator"
 import { classSchema } from "@/lib/schema"
 import { useBack } from "@refinedev/core" 
 import * as z from 'zod'
-import { useForm } from "react-hook-form"
+import { useForm } from "@refinedev/react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -20,10 +20,15 @@ const CreateClass = () => {
 
     const back = useBack()
 
-    const form = useForm<z.infer<typeof classSchema>>({
+    const form = useForm({
         resolver: zodResolver(classSchema),
+        refineCoreProps: {
+            resource: 'classes',
+            action: 'create'
+        },
         defaultValues: {
-            status: "active"
+            status: "active",
+            capacity: 1
         },
     })
 
@@ -157,7 +162,12 @@ const CreateClass = () => {
                                                     Capacity
                                                 </FormLabel>
                                                 <FormControl className="w-full">
-                                                    <Input type="number" defaultValue={1} placeholder="enter a cabacity" {...field}/>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="enter a capacity"
+                                                        {...field}
+                                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -173,7 +183,7 @@ const CreateClass = () => {
                                                     Status
                                                     <span className="text-primary">*</span>
                                                 </FormLabel>
-                                                <Select onValueChange={field.onChange}>
+                                                <Select onValueChange={field.onChange} value={field.value}>
                                                     <FormControl className="w-full">
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select a role" />
