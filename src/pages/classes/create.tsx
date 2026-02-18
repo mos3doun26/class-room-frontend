@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { subjects, teachers } from "@/constants"
 import {InputGroup, InputGroupTextarea} from '@/components/ui/input-group'
+import UploadWidget from "@/components/upload-widget"
 
 const CreateClass = () => {
 
@@ -31,6 +32,12 @@ const CreateClass = () => {
             capacity: 1
         },
     })
+    
+    const {
+        handleSubmit,
+        formState: {isSubmitting, errors},
+        control
+    } = form
 
     function onSubmit(values: z.infer<typeof classSchema>) {
         try{
@@ -39,6 +46,28 @@ const CreateClass = () => {
             console.error(e)
         }
     }
+
+    const setBannerImage = (file:any, field:any) => {
+        try{
+            if(file) {
+                field.onChange(file.url)
+                form.setValue('bannerCldPubId', file.publicId, {
+                    shouldValidate: true,
+                    shouldDirty: true
+                })
+            } else {
+                field.onChange('')
+                form.setValue('bannerCldPubId', '', {
+                    shouldValidate: true,
+                    shouldDirty: true
+                })
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
+
+    const bannerPublicId = form.watch('bannerCldPubId')
 
     return (
         <ListView>
@@ -66,16 +95,26 @@ const CreateClass = () => {
                                 <FormField
                                     control={form.control}
                                     name="bannerUrl"
-                                    render={() => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>
                                                 Banner Image
                                                 <span className="text-primary">*</span>
                                             </FormLabel>
                                             <FormControl>
-                                                <span>Upload image widget</span>
+                                                <UploadWidget
+                                                    value={field.value ? {url: field.value, publicId: bannerPublicId ?? ''} : null}
+                                                    onChange={(file)=>setBannerImage(file, field)}
+                                                />
                                             </FormControl>
                                             <FormMessage />
+                                            {
+                                                errors.bannerCldPubId && !errors.bannerUrl && (
+                                                    <p className="text-destructive text-sm">
+                                                        {errors.bannerCldPubId.message?.toString()}
+                                                    </p>
+                                                )
+                                            }
                                         </FormItem>
                                     )}
                                 />
