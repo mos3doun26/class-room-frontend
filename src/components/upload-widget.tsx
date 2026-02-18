@@ -70,7 +70,18 @@ export const UploadWidget = ({value=null, onChange, disabled=false}: UploadWidge
         preview ? <div className='upload-preview'>
           <img src={preview.url} alt='Upload image'/>
         </div>
-        : <div className='upload-dropzone' role='button' onClick={openWidget} tabIndex={0}>
+        : <div 
+            className='upload-dropzone'
+            role='button'
+            onClick={openWidget}
+            tabIndex={disabled ? -1 : 0}
+            onKeyDown={(e)=>{
+              if(e.key === 'Enter'){
+                e.preventDefault()
+                openWidget()
+              }
+            }}
+          >
             <div className='upload-prompt'>
             <UploadCloud className='icon'/>
             <div>
