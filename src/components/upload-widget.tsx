@@ -1,6 +1,6 @@
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from '@/constants'
 import { UploadWidgetProps, UploadWidgetValue } from '@/types'
-import { UploadCloud } from 'lucide-react'
+import { UploadCloud, X } from 'lucide-react'
 import {useState, useEffect, useRef} from 'react'
 
 export const UploadWidget = ({value=null, onChange, disabled=false}: UploadWidgetProps) => {
@@ -67,8 +67,19 @@ export const UploadWidget = ({value=null, onChange, disabled=false}: UploadWidge
   return (
     <div className='space-y-2'>
       {
-        preview ? <div className='upload-preview'>
+        preview ? <div className='upload-preview relative group'>
           <img src={preview.url} alt='Upload image'/>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setPreview(null)
+              onChangeRef.current?.(null as any)
+            }}
+            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <X size={20} />
+          </button>
         </div>
         : <div 
             className='upload-dropzone'
